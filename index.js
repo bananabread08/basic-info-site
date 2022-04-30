@@ -1,38 +1,24 @@
-const http = require('http');
-const fs = require('fs');
+const express = require('express');
+const app = express();
+const path = require('path');
+
 const port = process.env.PORT || 8080;
 
-const server = http.createServer((req, res) => {
-  res.setHeader('Content-Type', 'text/html');
-  let path = './pages/';
-  switch (req.url) {
-    case '/':
-      path += 'index.html';
-      res.statusCode = 200;
-      break;
-    case '/about':
-      path += 'about.html';
-      res.statusCode = 200;
-      break;
-    case '/contact':
-      path += 'contact.html';
-      res.statusCode = 200;
-      break;
-    default:
-      path += '404.html';
-      res.statusCode = 404;
-      break;
-  }
+// Set static folder
+app.use(express.static(path.join(__dirname, 'pages')));
 
-  //send an html file
-  fs.readFile(path, (err, data) => {
-    if (err) {
-      console.log(err);
-      res.end();
-    } else {
-      res.end(data);
-    }
-  });
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'about.html'));
 });
 
-server.listen(port, () => console.log(`Server running at port ${port}`));
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'contact.html'));
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', '404.html'));
+});
+
+app.listen(port, () =>
+  console.log(`Server started on https://localhost:${port}`)
+);
